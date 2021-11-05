@@ -43,7 +43,7 @@ async def stop(ctx):
 @bot.command()
 async def bonk(ctx, mention, *args):
     await ctx.message.delete()
-    try: times = int(args[0])
+    try: times = int(args[0]); args = args[1:]
     except ValueError: times = 1
     for n in range(0, times): await ctx.send(f'{mention} *bonk*')
     if args: await ctx.send('{}'.format(' '.join(args)))
