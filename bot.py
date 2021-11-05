@@ -9,7 +9,7 @@ import time
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-MY_ID = os.getenv('MY_ID')
+MY_ID = int(os.getenv('MY_ID'))
 
 # craigSimp = [
 #     ':blush: hi Craig! :heart_eyes::kissing_closed_eyes:',
@@ -37,8 +37,11 @@ async def pingme(ctx):
 
 @bot.command()
 async def stop(ctx):
-    if ctx.author.id == [MY_ID]:
-        exit()
+    if ctx.author.id == MY_ID:
+        await ctx.send('`shutting down...`')
+        time.sleep(1)
+        await ctx.send('`goodnight`')
+        exit(code=0)
 
 @bot.command()
 async def bonk(ctx, mention, *args):
@@ -51,7 +54,8 @@ async def bonk(ctx, mention, *args):
 
 @bot.command()
 async def say(ctx, *args):
-    await ctx.message.delete()
-    await ctx.send('{}'.format(' '.join(args)))
+    if ctx.author.id == MY_ID:
+        await ctx.message.delete()
+        await ctx.send('{}'.format(' '.join(args)))
 
 bot.run(TOKEN)
