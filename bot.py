@@ -7,6 +7,10 @@ from dotenv import load_dotenv
 from random import choice
 import time
 
+bootTime = time.localtime()
+
+logFile = open(f'logs/{time.strftime("%Y-%m-%d_%H.%M.%S", bootTime)}', 'w+')
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 MY_ID = int(os.getenv('MY_ID'))
@@ -24,6 +28,9 @@ bonkGifs = ['https://tenor.com/view/statewide-rp-mess-with-the-honk-you-get-the-
 'https://tenor.com/view/horny-bonk-gif-22415732',
 'https://tenor.com/view/no-horny-gura-bonk-gif-22888944']
 
+def log(ctx):
+    logFile.write(ctx)
+    print(ctx)
 
 bot = commands.Bot(command_prefix='\\')
 
