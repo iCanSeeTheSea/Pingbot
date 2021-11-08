@@ -28,27 +28,40 @@ bonkGifs = ['https://tenor.com/view/statewide-rp-mess-with-the-honk-you-get-the-
 'https://tenor.com/view/horny-bonk-gif-22415732',
 'https://tenor.com/view/no-horny-gura-bonk-gif-22888944']
 
-def log(ctx):
-    logFile.write(ctx)
-    print(ctx)
+
+def log(ctx, args):
+    currentTime = time.localtime()
+    logMessage = f'{time.strftime("%Y-%m-%d_%H.%M.%S", currentTime)} | {ctx.channel} | {ctx.author} used {ctx.command}: {" ".join(args)}'
+    logFile.write(f'\n{logMessage}')
+    print(logMessage)
 
 bot = commands.Bot(command_prefix='\\')
 
 @bot.event
 async def on_ready():
+    currentTime = time.localtime()
     print(f'{bot.user} is connected!')
+    logFile.write(f'{time.strftime("%Y-%m-%d_%H.%M.%S", currentTime)} | {bot.user} is connected!')
 
 @bot.command()
-async def pingme(ctx):
+async def pingme(ctx, *args):
     await ctx.send(f'hi {ctx.author.mention}!')
+    log(ctx, args)
 
 @bot.command()
-async def stop(ctx):
+async def stop(ctx, *args):
     if ctx.author.id == MY_ID:
         await ctx.send('`shutting down...`')
         time.sleep(1)
         await ctx.send('`goodnight`')
+        log(ctx, args)
         exit(code=0)
+
+@bot.command()
+async def sp(ctx, *args):
+    await ctx.message.delete()
+    await ctx.send(f'||{" ".join(args)}||')
+    log(ctx, args)
 
 @bot.command()
 async def bonk(ctx, mention, *args):
@@ -58,11 +71,13 @@ async def bonk(ctx, mention, *args):
     for n in range(0, times): await ctx.send(f'{mention} *bonk*')
     if args: await ctx.send('{}'.format(' '.join(args)))
     else: await ctx.send(choice(bonkGifs))
+    log(ctx, args)
 
 @bot.command()
 async def say(ctx, *args):
     if ctx.author.id == MY_ID:
         await ctx.message.delete()
         await ctx.send('{}'.format(' '.join(args)))
+        log(ctx, args)
 
 bot.run(TOKEN)
