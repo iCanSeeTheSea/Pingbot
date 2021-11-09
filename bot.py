@@ -9,7 +9,7 @@ import time
 
 bootTime = time.localtime()
 
-logFile = open(f'logs/{time.strftime("%Y-%m-%d_%H.%M.%S", bootTime)}', 'w+')
+# logFile = open(f'logs/{time.strftime("%Y-%m-%d_%H.%M.%S", bootTime)}.txt', 'w+')
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -32,7 +32,7 @@ bonkGifs = ['https://tenor.com/view/statewide-rp-mess-with-the-honk-you-get-the-
 def log(ctx, args):
     currentTime = time.localtime()
     logMessage = f'{time.strftime("%Y-%m-%d_%H.%M.%S", currentTime)} | {ctx.channel} | {ctx.author} used {ctx.command}: {" ".join(args)}'
-    logFile.write(f'\n{logMessage}')
+    # logFile.write(f'\n{logMessage}')
     print(logMessage)
 
 bot = commands.Bot(command_prefix='\\')
@@ -41,7 +41,7 @@ bot = commands.Bot(command_prefix='\\')
 async def on_ready():
     currentTime = time.localtime()
     print(f'{bot.user} is connected!')
-    logFile.write(f'{time.strftime("%Y-%m-%d_%H.%M.%S", currentTime)} | {bot.user} is connected!')
+    # logFile.write(f'{time.strftime("%Y-%m-%d_%H.%M.%S", currentTime)} | {bot.user} is connected!')
 
 @bot.command()
 async def pingme(ctx, *args):
@@ -68,7 +68,7 @@ async def bonk(ctx, mention, *args):
     if mention != ctx.message.mentions[-1].mention: return
     await ctx.message.delete()
     try: times = int(args[0]); args = args[1:]
-    except ValueError: times = 1
+    except: times = 1
     for n in range(0, times): await ctx.send(f'{mention} *bonk*')
     if args: await ctx.send(" ".join(args))
     else: await ctx.send(choice(bonkGifs)); args = ' '
