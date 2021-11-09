@@ -65,13 +65,14 @@ async def sp(ctx, *args):
 
 @bot.command()
 async def bonk(ctx, mention, *args):
+    if mention != ctx.message.mentions[-1].mention: return
     await ctx.message.delete()
     try: times = int(args[0]); args = args[1:]
     except ValueError: times = 1
     for n in range(0, times): await ctx.send(f'{mention} *bonk*')
-    if args: await ctx.send('{}'.format(' '.join(args)))
-    else: await ctx.send(choice(bonkGifs))
-    log(ctx, args)
+    if args: await ctx.send(" ".join(args))
+    else: await ctx.send(choice(bonkGifs)); args = ' '
+    log(ctx, args=[mention, str(times), " ".join(args)])
 
 @bot.command()
 async def say(ctx, *args):
