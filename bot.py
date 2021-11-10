@@ -28,6 +28,30 @@ bonkGifs = ['https://tenor.com/view/statewide-rp-mess-with-the-honk-you-get-the-
 'https://tenor.com/view/horny-bonk-gif-22415732',
 'https://tenor.com/view/no-horny-gura-bonk-gif-22888944']
 
+reacted_messages = []
+
+help_messages = { 'standard': '''```
+Available commands:
+    - pingme
+    - bonk
+    - ntf
+
+For more information about a command, try \\help <command>.
+```''',
+'pingme': '`Pingme: literally just pings you.`', 
+'bonk':'''```
+Bonk: pings a user a certain number of times.
+    \\bonk <@user> <number of times> <message>
+
+- Leaving <number of times> blank will ping once.
+- Leaving <message> blank will send a random bonk-related gif.
+```''', 
+'ntf': '''```
+Notify: pings a user/s with any message as a spoiler. When everyone pinged reacts with ✅ the message is deleted.
+    \\ntf <message>
+
+- Message must include at least one ping.
+```'''}
 
 def log(ctx, args):
     currentTime = time.localtime()
@@ -35,7 +59,7 @@ def log(ctx, args):
     # logFile.write(f'\n{logMessage}')
     print(logMessage)
 
-bot = commands.Bot(command_prefix='\\')
+bot = commands.Bot(command_prefix='\\', help_command=None)
 
 @bot.event
 async def on_ready():
@@ -43,6 +67,11 @@ async def on_ready():
     print(f'{bot.user} is connected!')
     # logFile.write(f'{time.strftime("%Y-%m-%d_%H.%M.%S", currentTime)} | {bot.user} is connected!')
 
+@bot.command()
+async def help(ctx, *args):
+    if not args: await ctx.send(help_messages['standard'])
+    else: await ctx.send(help_messages[args[0]])
+    
 @bot.command()
 async def pingme(ctx, *args):
     await ctx.send(f'hi {ctx.author.mention}!')
@@ -58,10 +87,23 @@ async def stop(ctx, *args):
         exit(code=0)
 
 @bot.command()
-async def sp(ctx, *args):
+async def ntf(ctx, *args):
+    if not ctx.message.raw_mentions: return
     await ctx.message.delete()
-    await ctx.send(f'||{" ".join(args)}||')
+    message = await ctx.send(f'||{" ".join(args)}||')
+    await message.add_reaction('✅')
     log(ctx, args)
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    message = reaction.message
+    if user.bot: reacted_messages.append(message.id); return
+    if reaction.emoji == '✅' and message.id in reacted_messages:
+        for ids in message.raw_mentions:
+            if user.id != ids:
+                return
+        reacted_messages.remove(message.id)
+        await message.delete()
 
 @bot.command()
 async def bonk(ctx, mention, *args):
