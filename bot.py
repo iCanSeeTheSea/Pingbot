@@ -28,7 +28,7 @@ bonkGifs = ['https://tenor.com/view/statewide-rp-mess-with-the-honk-you-get-the-
 'https://tenor.com/view/horny-bonk-gif-22415732',
 'https://tenor.com/view/no-horny-gura-bonk-gif-22888944']
 
-reacted_messages = []
+ntf_messages = {}
 
 help_messages = { 'standard': '''```
 Available commands:
@@ -86,29 +86,19 @@ async def stop(ctx, *args):
         log(ctx, args)
         exit(code=0)
 
-@bot.command()
-async def ntf(ctx, *args):
-    if not ctx.message.raw_mentions: return
-    await ctx.message.delete()
-    message = await ctx.send(f'||{" ".join(args)}||')
-    await message.add_reaction('✅')
-    log(ctx, args)
-
 @bot.event
 async def on_reaction_add(reaction, user):
     message = reaction.message
-    if user.bot: reacted_messages.append(message.id); return
-    if reaction.emoji == '✅' and message.id in reacted_messages:
-        for ids in message.raw_mentions:
-            if user.id != ids:
-                return
-        reacted_messages.remove(message.id)
-        await message.delete()
+    if user.bot: return
+    if reaction.emoji == '✅' and message.id in ntf_messages:
+        if user.id in ntf_messages[message.id]:
+            ntf_messages[message.id].remove(user.id)
+            if not ntf_messages[message.id]:
+                await message.delete()
 
 @bot.command()
 async def bonk(ctx, mention, *args):
-    if mention != ctx.message.mentions[-1].mention: return
-    await ctx.message.delete()
+    if int(mention[3:-1]) != ctx.message.raw_mentions[0]: return
     try: times = int(args[0]); args = args[1:]
     except: times = 1
     for n in range(0, times): await ctx.send(f'{mention} *bonk*')
