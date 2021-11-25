@@ -14,6 +14,8 @@ bootTime = time.localtime()
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 MY_ID = int(os.getenv('MY_ID'))
+AMB_ID = os.getenv('AMB_ID')
+
 
 # craigSimp = [
 #     ':blush: hi Craig! :heart_eyes::kissing_closed_eyes:',
@@ -86,20 +88,30 @@ async def stop(ctx, *args):
         log(ctx, args)
         exit(code=0)
 
-@bot.event
-async def on_reaction_add(reaction, user):
-    message = reaction.message
-    if user.bot: return
-    if reaction.emoji == '✅' and message.id in ntf_messages:
-        if user.id in ntf_messages[message.id]:
-            ntf_messages[message.id].remove(user.id)
-            if not ntf_messages[message.id]:
-                await message.delete()
+# @bot.event
+# async def on_reaction_add(reaction, user):
+#     message = reaction.message
+#     if user.bot: return
+#     if reaction.emoji == '✅' and message.id in ntf_messages:
+#         if user.id in ntf_messages[message.id]:
+#             ntf_messages[message.id].remove(user.id)
+#             if not ntf_messages[message.id]:
+#                 await message.delete()
 
 @bot.command()
 async def bonk(ctx, mention, *args):
     if int(mention[3:-1]) != ctx.message.raw_mentions[0]: return
-    try: times = int(args[0]); args = args[1:]
+    try: times = int(args[0]); args = args[1:]; times = checkBonkNum(times)
+    except: times = 1
+    for n in range(0, times): await ctx.send(f'{mention} *bonk*')
+    if args: await ctx.send(" ".join(args))
+    else: await ctx.send(choice(bonkGifs)); args = ' '
+    log(ctx, args=[mention, str(times), " ".join(args)])
+
+@bot.command()
+async def abonk(ctx, *args):
+    mention = '<@' + AMB_ID + '>'
+    try: times = int(args[0]); args = args[1:]; times = checkBonkNum(times)
     except: times = 1
     for n in range(0, times): await ctx.send(f'{mention} *bonk*')
     if args: await ctx.send(" ".join(args))
@@ -112,5 +124,10 @@ async def say(ctx, *args):
         await ctx.message.delete()
         await ctx.send('{}'.format(' '.join(args)))
         log(ctx, args)
+
+def checkBonkNum(times):
+    if times > 10: return 10
+    elif times < 1 : return 1
+    else: return times
 
 bot.run(TOKEN)
